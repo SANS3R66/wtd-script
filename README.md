@@ -1,6 +1,6 @@
 The World: Tower Defenders Roblox game script... first ever public WTD script! Very pro.
 
-synapse.d.luau is types made by me that includes some of Synapse env that i use and some of FluentUI methods. Not finished.
+synapse.d.luau is types made by me that includes some of Synapse env that i use and some of FluentUI methods. Not finished. (use [vscode extension](https://marketplace.visualstudio.com/items?itemName=JohnnyMorganz.luau-lsp))
 
 Idiotic and shitty ass script patterns are expected. (english too)
 

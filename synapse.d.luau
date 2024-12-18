@@ -12751,7 +12751,50 @@ type FluentUIWindowTabConstructor = {
     ["Title"]: string, ["Icon"]: string
 }
 
+type FluentUITabToggleConstructor = {
+	["Title"]: string, ["Description"]: string, ["Default"]: boolean
+}
+
+type FluentUITabButton = {
+	["Title"]: string, ["Description"]: string, ["Callback"]: () -> (...any)
+}
+
+type FluentUITabInputConstructor = {
+	["Title"]: string, ["Description"]: string, ["Default"]: string,
+	["Placeholder"]: string, ["Numeric"]: boolean, ["Finished"]: boolean,
+	["Callback"]: () -> (...any)
+}
+
+type FluentUITabParagraph = {
+	["Title"]: string, ["Content"]: string, ['TitleAlignment']: string?, -- TODO: add variants instead of just string type
+	["ContentAlignment"]: EnumTextXAlignment?
+}
+
+type FluentUITabDropdownConstructor = {
+	["Title"]: string, ["Description"]: string, ["Values"]: {string} -- TODO: values is not only string?
+}
+
+declare class FluentUITabToggle
+	function OnChanged(self, callback: () -> (...any))
+	Value: boolean
+end
+
+declare class FluentUITabInput
+	Value: string
+end
+
+declare class FluentUITabDropdown
+	Value: string
+	function SetValue(self, value: string)
+end
+
 declare class FluentUITab
+	function AddSection(self, sectionName: string): FluentUITab
+	function CreateToggle(self, toggleName: string, arguments: FluentUITabToggleConstructor): FluentUITabToggle
+	function CreateButton(self, arguments: FluentUITabButton): ()
+	function CreateInput(self, inputName: string, arguments: FluentUITabInputConstructor): FluentUITabInput
+	function CreateParagraph(self, paragraphName: string, arguments: FluentUITabParagraph): ()
+	function CreateDropdown(self, dropdownName: string, arguments: FluentUITabDropdownConstructor): FluentUITabDropdown
 end
 
 declare class FluentUIWindow
