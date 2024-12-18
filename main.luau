@@ -170,12 +170,11 @@ do
 		Title = "Set leaderboard icon",
 		Description = "",
 		Callback = function()
+			-- TODO: implement retarded method
 			if leaderboardmethod.Value == "retarded" then
 				Library:Notify({ Title = "sorry", Content = "Retarded method is not avaliable.", Duration = 5 })
 				return
 			end
-
-			--if leaderboardicon.Value == nil then Library:Notify{Title = "retarded", Content = "Select icon..", Duration = 5} return end
 
 			local iconPrompts = {
 				["Asiluga"] = "rbxassetid://9840325624",
