@@ -1,3 +1,9 @@
+type WTDTagTableTag = {
+	ID: number,
+	tagName: string,
+	tagDescription: string,
+}
+
 -- for no types error
 local LibrarySrc =
 	game:HttpGetAsync("https://github.com/ActualMasterOogway/Fluent-Renewed/releases/latest/download/Fluent.luau")
@@ -8,19 +14,46 @@ if LibrarySrc ~= nil then
 end
 
 local LPlayer = (game:GetService("Players") :: Players).LocalPlayer
-local TeleportService = game:GetService("TeleportService")
+local GUI = LPlayer.PlayerGui :: PlayerGui
+local BoardSubFrame = GUI.board.LeaderBoardFrame.ListFrame.BottomFrame.SubFrame :: Frame
+local TeleportService = game:GetService("TeleportService") :: TeleportService
 local ReplicatedStorage = game:GetService("ReplicatedStorage") :: ReplicatedStorage
+
+local FXEvent = ReplicatedStorage.Folder.FX :: RemoteEvent
 
 local testerButtonPaths = {
 	LPlayer.PlayerGui.AwesomeGUI.SettingsThing.Frame.testerButton,
 	LPlayer.PlayerGui.AwesomeGUI.SettingsThing.Frame.theButton,
 	LPlayer.PlayerGui.AwesomeGUI.SettingsThing.Frame.theButton2,
-}
-local placesIDs = { ["testerLobby"] = 756609063 }
+} :: { TextButton }
+local placesIDs = { ["testerLobby"] = 756609063 } :: { [string]: number }
+
+local selectedIcon = ""
+
+local function updateImagelabelBoardIcon()
+	for _, v in BoardSubFrame:GetChildren() do
+		if v.Name == "b" then
+			if (v:FindFirstChild("TitleFrame"):FindFirstChild("Title") :: TextLabel).Text == LPlayer.DisplayName then
+				(v:FindFirstChild("BCLabel") :: ImageLabel).Image = selectedIcon
+			end
+		end
+	end
+end
+
+local isStartedConnectBoard = false
+local function startConnectBoard()
+	if isStartedConnectBoard then
+		return
+	end
+	isStartedConnectBoard = true
+	BoardSubFrame.ChildAdded:Connect(function()
+		updateImagelabelBoardIcon() -- FIXME: dont need to go for every single child when another one added :sob:
+	end)
+end
 
 local Window = Library:CreateWindow({
-	Title = "wetede script!",
-	SubTitle = "Fluent UI Library: Renewed!!!!1",
+	Title = "WTDhook: Lobby",
+	SubTitle = "",
 	TabWidth = 160,
 	Size = UDim2.fromOffset(830, 525),
 	Resize = true,
@@ -152,7 +185,7 @@ do
 	local leaderboardicon = leaderboardSectionIcon:CreateDropdown("boardicon", {
 		Title = "Leaderboard icon replacement method",
 		Description = "Select leaderboard icon replacement method",
-		Values = { "Asiluga", "Babygoo25", "Realsayon1", "No icon" },
+		Values = { "Asiluga", "Babygoo25", "Realsayon1", "VIP", "No icon" },
 	})
 	leaderboardicon:SetValue("No icon")
 
@@ -170,34 +203,78 @@ do
 		Title = "Set leaderboard icon",
 		Description = "",
 		Callback = function()
-			-- TODO: implement retarded method
-			if leaderboardmethod.Value == "retarded" then
+			--[[if leaderboardmethod.Value == "retarded" then
 				Library:Notify({ Title = "sorry", Content = "Retarded method is not avaliable.", Duration = 5 })
 				return
-			end
+			end]]
 
 			local iconPrompts = {
 				["Asiluga"] = "rbxassetid://9840325624",
 				["Babygoo25"] = "rbxassetid://2998647800",
 				["Realsayon1"] = "rbxassetid://9840323740",
+				["VIP"] = "rbxassetid://11919061440",
 			}
 
-			local success, response = pcall(function()
-				local targetfunc = getsenv(LPlayer.PlayerGui.board.Leaderboard).RegenPlayers :: () -> ()
-				local newiconValue
-				if boardiconinput.Value == "" then
-					newiconValue = iconPrompts[leaderboardicon.Value]
-				else
-					print(boardiconinput.Value)
-					newiconValue = "rbxassetid://" .. boardiconinput.Value
-				end
-				(debug.getupvalue(targetfunc, 3) :: { [number]: string })[LPlayer.UserId] = newiconValue
-				targetfunc()
-			end)
+			if boardiconinput.Value == "" then
+				selectedIcon = iconPrompts[leaderboardicon.Value] or ""
+			else
+				selectedIcon = "rbxassetid://" .. boardiconinput.Value
+			end
 
-			if not success then
-				Library:Notify({ Title = "Board icon: Error!", Content = response, Duration = 8 })
+			if leaderboardmethod.Value == "good" then
+				local success, response = pcall(function()
+					local targetfunc = getsenv(LPlayer.PlayerGui.board.Leaderboard).RegenPlayers :: () -> ();
+					(debug.getupvalue(targetfunc, 3) :: { [number]: string })[LPlayer.UserId] = selectedIcon
+					targetfunc()
+				end)
+
+				if not success then
+					Library:Notify({ Title = "Board icon: Error!", Content = response, Duration = 8 })
+				end
+			else
+				startConnectBoard()
+				updateImagelabelBoardIcon()
 			end
 		end,
 	})
+
+	-- getting tags
+	local tagsTable = {} :: { [string]: WTDTagTableTag }
+	local _, tagPCallResult = pcall(function()
+		for i, v in getconnections(FXEvent.OnClientEvent) do
+			local value = debug.getupvalue(v.Function, 2) :: { [string]: {any} }
+			if type(value) == "table" then
+				if value["none"] ~= nil then
+					-- fucking types
+					for a, b in value do
+						tagsTable[a] = {}
+						tagsTable[a].ID = b[1]
+						tagsTable[a].tagName = b[2]
+						tagsTable[a].tagDescription = b[3]
+					end
+					break
+				end
+			end
+		end
+	end)
+
+	-- make tags last so no flood
+	local tagsSection = Tabs.Local:AddSection("Tags")
+	local formatString = "[TAG %s] %s [%d]"
+	if tagsTable["none"] ~= nil then
+		for i, v in tagsTable do
+			tagsSection:CreateButton({
+				Title = string.format(formatString, i, v.tagName, v.ID),
+				Description = v.tagDescription,
+				Callback = function()
+					LPlayer:SetAttribute("Owned_Tag", i)
+				end,
+			})
+		end
+	else
+		tagsSection:CreateParagraph(
+			"",
+			{ Title = "Error..", Content = "Failed to get Tags. Error:\n" .. tagPCallResult }
+		)
+	end
 end

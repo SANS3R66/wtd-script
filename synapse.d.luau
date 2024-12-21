@@ -12723,6 +12723,20 @@ declare script: LuaSourceContainer
 declare function settings(): GlobalSettings
 declare function UserSettings(): UserSettings
 
+declare class Connection
+	Enabled: boolean
+	ForeignState: boolean
+	LuaConnection: boolean
+	Function: (...any) -> (...any)?
+	Thread: (...any) -> (...any)? -- FIXME: not sure if thread is a just function
+	
+	function Fire(self, ...: any): ()
+	function Defer(self, ...: any): ()
+	function Disconnect(self): ()
+	function Disable(self): ()
+	function Enable(self): ()
+end
+
 declare function getgenv(): {[string]: any}
 declare function getgc(includeTables: boolean?): ((...any) -> (...any) | Instance | {[any]: any})
 declare function getloadedmodules(excludeCore: boolean?): {ModuleScript}
@@ -12735,6 +12749,32 @@ declare function getscripts(): {ModuleScript | LocalScript}
 declare function getsenv(script: ModuleScript | LocalScript): {[string]: any}
 declare function getthreadidentity(): number
 declare function setthreadidentity(identity: number): ()
+declare function getconnections(signal: RBXScriptSignal): {Connection}
+declare function readfile(path: string): string
+declare function listfiles(path: string): {string}
+declare function writefile(path: string, data: string): ()
+declare function makefolder(path: string): ()
+declare function appendfile(path: string, data: string): ()
+declare function isfile(path: string): boolean
+declare function isfolder(path: string): boolean
+declare function delfile(path: string): ()
+declare function delfolder(path: string): ()
+declare function loadfile(path: string, chunkname: string?): ((...any) -> (...any)?, string?)
+declare function dofile(path: string): ()
+declare function getrawmetatable(object: {any} | Instance): {[any]: any}
+declare function hookmetamethod(object: {any} | Instance, method: string, hook: (...any) -> (...any)): (...any) -> (...any)
+declare function getnamecallmethod(): string
+declare function isreadonly(object: {any} | Instance): boolean
+declare function setrawmetatable(object: {any} | Instance, metatable: {any}): ()
+declare function setreadonly(object: {any} | Instance, readonly: boolean): ()
+declare function checkcaller(): boolean
+declare function clonefunction(func: (...any) -> (...any)): (...any) -> (...any)
+declare function getcallingscript(): ModuleScript | LocalScript
+declare function hookfunction(func: (...any) -> (...any), hook: (...any) -> (...any)): (...any) -> (...any)
+declare function iscclosure(func: (...any) -> (...any)): boolean
+declare function islclosure(func: (...any) -> (...any)): boolean
+declare function isexecutorclosure(func: (...any) -> (...any)): boolean
+declare function newcclosure(func: (...any) -> (...any)): (...any) -> (...any)
 
 type FluentUIConstructor = {
     ["Title"]: string, ["SubTitle"]: string, ["TabWidth"]: number,
