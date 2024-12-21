@@ -1,3 +1,6 @@
+--!native
+--!optimize 2
+
 type WTDTagTableTag = {
 	ID: number,
 	tagName: string,
@@ -9,9 +12,7 @@ local LibrarySrc =
 	game:HttpGetAsync("https://github.com/ActualMasterOogway/Fluent-Renewed/releases/latest/download/Fluent.luau")
 LibrarySrc = loadstring(LibrarySrc)
 local Library: FluentUI
-if LibrarySrc ~= nil then
-	Library = LibrarySrc() :: FluentUI
-end
+Library = LibrarySrc() :: FluentUI
 
 local LPlayer = (game:GetService("Players") :: Players).LocalPlayer
 local GUI = LPlayer.PlayerGui :: PlayerGui

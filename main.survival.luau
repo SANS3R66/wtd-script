@@ -1,3 +1,6 @@
+--!native
+--!optimize 2
+
 makefolder("wtdhook")
 makefolder("wtdhook/macroses")
 
