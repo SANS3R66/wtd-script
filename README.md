@@ -10,8 +10,11 @@ The main script in **main.luau** file. You can edit it whatever you want, but gi
 
 I will add license soon.
 
-Tools i used:
-1. Solara (for dex explorer)
-2. Swift (cause argon doesnt work for me :sob:) (also cant open dex explorer and have NO decompiler :sob:)
+Tools im using:
+1. Swift
 
-General support for solara and other shitty ass level 3 executor is not main goal because otherwise i need to use 🦽 to make a script. (nvm my 🦽 script 🦽 is 🦽 already 🦽 wheelchair 🦽)
+(now only swift cause it got more stable)
+
+General support for solara and other shitty ass level 3 executor is not main goal because otherwise i need to use 🦽 to make a script. (my 🦽 script 🦽 is 🦽 already 🦽 actually 🦽 wheelchair 🦽)
+
+Macroses for WTD Survival in active works.

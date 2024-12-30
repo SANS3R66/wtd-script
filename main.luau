@@ -8,17 +8,22 @@ type WTDTagTableTag = {
 }
 
 -- for no types error
+local osclockBefore = os.clock()
 local LibrarySrc =
 	game:HttpGetAsync("https://github.com/ActualMasterOogway/Fluent-Renewed/releases/latest/download/Fluent.luau")
 LibrarySrc = loadstring(LibrarySrc)
 local Library: FluentUI
 Library = LibrarySrc() :: FluentUI
+print("took " .. os.clock() - osclockBefore .. "s to load Fluent Renewed library..")
+
+osclockBefore = os.clock()
 
 local LPlayer = (game:GetService("Players") :: Players).LocalPlayer
 local GUI = LPlayer.PlayerGui :: PlayerGui
 local BoardSubFrame = GUI.board.LeaderBoardFrame.ListFrame.BottomFrame.SubFrame :: Frame
 local TeleportService = game:GetService("TeleportService") :: TeleportService
 local ReplicatedStorage = game:GetService("ReplicatedStorage") :: ReplicatedStorage
+local Lighting = game:GetService("Lighting") :: Lighting
 
 local FXEvent = ReplicatedStorage.Folder.FX :: RemoteEvent
 
@@ -48,7 +53,7 @@ local function startConnectBoard()
 	end
 	isStartedConnectBoard = true
 	BoardSubFrame.ChildAdded:Connect(function()
-		updateImagelabelBoardIcon() -- FIXME: dont need to go for every single child when another one added :sob:
+		updateImagelabelBoardIcon() -- FIXME: dont need to go for every single child when another one added :sob: (solara users dont worth to fix it!)
 	end)
 end
 
@@ -83,6 +88,17 @@ local Tabs = {
 
 -- main tab
 do
+	Tabs.Main:CreateButton({
+		Title = "No blur",
+		Description = "Removes really bad blur at 8+ graphics",
+		Callback = function()
+			for i, v in Lighting:GetChildren() do
+				if v.Name == "DepthOfField" then
+					v:Destroy()
+				end
+			end
+		end,
+	})
 end
 
 -- fun tab
@@ -91,7 +107,7 @@ do
 
 	local testerButtonsToggle = testerSectionButtons:CreateToggle(
 		"",
-		{ Title = "See tester buttons", Description = "They dont do anything anyways..", Default = false }
+		{ Title = "Show tester buttons", Description = "They dont do anything anyways..", Default = false }
 	)
 	testerButtonsToggle:OnChanged(function()
 		for i, v in testerButtonPaths do
@@ -178,7 +194,7 @@ do
 
 	leaderboardSectionIcon:CreateParagraph("", {
 		Title = "Methods",
-		Content = "good - Use this method because its not retarded. Only if this executor supports getsenv and debug.getupvalue \n\nretarded - Using shitty ass method via replacing icon in ImageLabel. Use this if you use something like solara \n\nDONT use both methods in one time...",
+		Content = "good - Use this method because its not retarded. Only if this executor supports getsenv and debug.getupvalue \n\nretarded - Using shitty ass method via replacing icon in ImageLabel. Use this if you use something like solara. \n\nRetarded method will overwrite good method",
 		TitleAlignment = "Middle",
 		ContentAlignment = Enum.TextXAlignment.Center,
 	})
@@ -192,7 +208,7 @@ do
 
 	local boardiconinput = leaderboardSectionIcon:CreateInput("", {
 		Title = "Custom icon ID",
-		Description = "You need to input ONLY numbers!",
+		Description = "You need to input ONLY numbSers!",
 		Default = "",
 		Placeholder = "11971577760",
 		Numeric = true,
@@ -243,7 +259,7 @@ do
 	local tagsTable = {} :: { [string]: WTDTagTableTag }
 	local _, tagPCallResult = pcall(function()
 		for i, v in getconnections(FXEvent.OnClientEvent) do
-			local value = debug.getupvalue(v.Function, 2) :: { [string]: {any} }
+			local value = debug.getupvalue(v.Function, 2) :: { [string]: { any } }
 			if type(value) == "table" then
 				if value["none"] ~= nil then
 					-- fucking types
@@ -269,6 +285,7 @@ do
 				Description = v.tagDescription,
 				Callback = function()
 					LPlayer:SetAttribute("Owned_Tag", i)
+					Library:Notify({ Title = "Owned tag", Content = "now using tag " .. v.tagName, Duration = 8 })
 				end,
 			})
 		end
@@ -279,3 +296,5 @@ do
 		)
 	end
 end
+
+print("took " .. os.clock() - osclockBefore .. "s to load main script!")

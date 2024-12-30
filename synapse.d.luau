@@ -10551,6 +10551,7 @@ declare class DataModel extends ServiceProvider
 	function GetObjectsList(self, urls: { any }): { any }
 	function GetPlaySessionId(self): string
 	function HttpGetAsync(self, url: string, httpRequestType: EnumHttpRequestType?): string
+	function HttpGet(self, url: string): string
 	function HttpPostAsync(self, url: string, data: string, contentType: string?, httpRequestType: EnumHttpRequestType?): string
 	function InsertObjectsAndJoinIfLegacyAsync(self, url: ContentId): { Instance }
 	function IsContentLoaded(self): boolean
@@ -12775,6 +12776,9 @@ declare function iscclosure(func: (...any) -> (...any)): boolean
 declare function islclosure(func: (...any) -> (...any)): boolean
 declare function isexecutorclosure(func: (...any) -> (...any)): boolean
 declare function newcclosure(func: (...any) -> (...any)): (...any) -> (...any)
+declare function firesignal(signal: RBXScriptSignal, ...: any)
+declare function gethui(): ScreenGui
+declare function cloneref(instance: any): any
 
 type FluentUIConstructor = {
     ["Title"]: string, ["SubTitle"]: string, ["TabWidth"]: number,
@@ -12839,6 +12843,7 @@ end
 
 declare class FluentUIWindow
     function CreateTab(self, arguments: FluentUIWindowTabConstructor): FluentUITab
+	function SelectTab(self, tabIndex: number)
 end
 
 declare class FluentUI
