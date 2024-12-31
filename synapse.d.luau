@@ -12796,7 +12796,8 @@ type FluentUIWindowTabConstructor = {
 }
 
 type FluentUITabToggleConstructor = {
-	["Title"]: string, ["Description"]: string, ["Default"]: boolean
+	["Title"]: string, ["Description"]: string, ["Default"]: boolean,
+	["Callback"]: (state: boolean, ...any) -> (...any)
 }
 
 type FluentUITabButton = {

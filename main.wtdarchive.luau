@@ -7,10 +7,14 @@ Library = LibrarySrc() :: FluentUI
 print("took " .. os.clock() - osclockBefore .. "s to load Fluent Renewed library..")
 osclockBefore = os.clock()
 
-local LPlayer = (game:GetService("Players") :: Players).LocalPlayer
-local _GUI = LPlayer.PlayerGui :: PlayerGui
 local ReplicatedStorage = game:GetService("ReplicatedStorage") :: ReplicatedStorage
 local Lighting = game:GetService("Lighting") :: Lighting
+local Debris = game:GetService("Debris") :: Debris
+
+local LPlayer = (game:GetService("Players") :: Players).LocalPlayer
+local Character = LPlayer.Character :: Model
+local HRoot = Character:FindFirstChild("HumanoidRootPart") :: Part
+local _GUI = LPlayer.PlayerGui :: PlayerGui
 local FX = ReplicatedStorage.Folder.FX :: RemoteEvent
 
 local selectedIcon
@@ -61,6 +65,39 @@ end
 
 -- fun tab
 do
+	do
+		local section = Tabs.Fun:AddSection("Vent")
+
+		section:CreateButton({
+			Title = "Teleport to the vent",
+			Callback = function()
+				HRoot.CFrame = CFrame.new(1347.62646484375, -78.74113464355469, 275.0109558105469)
+			end,
+		})
+
+		section:CreateButton({
+			Title = "Blow up the vent",
+			Description = "Re-implemented from decompilation\nVentbars will explode automatically from server if you have or have more than 50(?) trophies\nThis is local obv",
+			Callback = function()
+				local openthing = workspace:FindFirstChild("OpenThing") :: Part
+				if workspace:FindFirstChild("VentBars") then
+					(workspace:FindFirstChild("VentBars") :: UnionOperation):Destroy()
+				end
+				local v3 = Instance.new("Sound")
+				v3.Pitch = 1
+				v3.Volume = 2.5
+				v3.SoundId = "rbxassetid://3995434918"
+				v3.Parent = openthing
+				v3:Play()
+				Debris:AddItem(v3, 3.2)
+				local v4 = Instance.new("Explosion")
+				v4.Position = openthing.Position
+				v4.BlastRadius = 0
+				v4.Parent = workspace
+				Debris:AddItem(v4, 1)
+			end,
+		})
+	end
 end
 
 -- local tab

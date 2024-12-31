@@ -28,9 +28,9 @@ local Lighting = game:GetService("Lighting") :: Lighting
 local FXEvent = ReplicatedStorage.Folder.FX :: RemoteEvent
 
 local testerButtonPaths = {
-	LPlayer.PlayerGui.AwesomeGUI.SettingsThing.Frame.testerButton,
-	LPlayer.PlayerGui.AwesomeGUI.SettingsThing.Frame.theButton,
-	LPlayer.PlayerGui.AwesomeGUI.SettingsThing.Frame.theButton2,
+	GUI.AwesomeGUI.SettingsThing.Frame.testerButton,
+	GUI.AwesomeGUI.SettingsThing.Frame.theButton,
+	GUI.AwesomeGUI.SettingsThing.Frame.theButton2,
 } :: { TextButton }
 local placesIDs = { ["testerLobby"] = 756609063 } :: { [string]: number }
 
@@ -96,6 +96,20 @@ do
 				if v.Name == "DepthOfField" then
 					v:Destroy()
 				end
+			end
+		end,
+	})
+
+	Tabs.Main:CreateButton({
+		Title = "No rain",
+		Callback = function()
+			local pRain = workspace:FindFirstChild("pRain") :: Part
+			local Rains = workspace:FindFirstChild("rains") :: Folder
+			if pRain then
+				pRain:Destroy()
+			end
+			if Rains then
+				Rains:Destroy()
 			end
 		end,
 	})
@@ -183,77 +197,93 @@ do
 		ContentAlignment = Enum.TextXAlignment.Center,
 	})
 
-	local leaderboardSectionIcon = Tabs.Local:AddSection("Leaderboard icons")
+	do
+		local leaderboardSectionIcon = Tabs.Local:AddSection("Leaderboard")
 
-	local leaderboardmethod = leaderboardSectionIcon:CreateDropdown("boardmethod", {
-		Title = "Leaderboard icon replacement method",
-		Description = "Select leaderboard icon replacement method",
-		Values = { "good", "retarded" },
-	})
-	leaderboardmethod:SetValue("good")
+		local leaderboardmethod = leaderboardSectionIcon:CreateDropdown("boardmethod", {
+			Title = "Leaderboard icon replacement method",
+			Description = "Select leaderboard icon replacement method",
+			Values = { "good", "retarded" },
+		})
+		leaderboardmethod:SetValue("good")
 
-	leaderboardSectionIcon:CreateParagraph("", {
-		Title = "Methods",
-		Content = "good - Use this method because its not retarded. Only if this executor supports getsenv and debug.getupvalue \n\nretarded - Using shitty ass method via replacing icon in ImageLabel. Use this if you use something like solara. \n\nRetarded method will overwrite good method",
-		TitleAlignment = "Middle",
-		ContentAlignment = Enum.TextXAlignment.Center,
-	})
+		leaderboardSectionIcon:CreateParagraph("", {
+			Title = "Methods",
+			Content = "good - Use this method because its not retarded. Only if this executor supports getsenv and debug.getupvalue \n\nretarded - Using shitty ass method via replacing icon in ImageLabel. Use this if you use something like solara. \n\nRetarded method will overwrite good method",
+			TitleAlignment = "Middle",
+			ContentAlignment = Enum.TextXAlignment.Center,
+		})
 
-	local leaderboardicon = leaderboardSectionIcon:CreateDropdown("boardicon", {
-		Title = "Leaderboard icon replacement method",
-		Description = "Select leaderboard icon replacement method",
-		Values = { "Asiluga", "Babygoo25", "Realsayon1", "VIP", "No icon" },
-	})
-	leaderboardicon:SetValue("No icon")
+		local leaderboardicon = leaderboardSectionIcon:CreateDropdown("boardicon", {
+			Title = "Leaderboard icon replacement method",
+			Description = "Select leaderboard icon replacement method",
+			Values = { "Asiluga", "Babygoo25", "Realsayon1", "VIP", "No icon" },
+		})
+		leaderboardicon:SetValue("No icon")
 
-	local boardiconinput = leaderboardSectionIcon:CreateInput("", {
-		Title = "Custom icon ID",
-		Description = "You need to input ONLY numbSers!",
-		Default = "",
-		Placeholder = "11971577760",
-		Numeric = true,
-		Finished = false,
-		Callback = function() end,
-	})
+		local boardiconinput = leaderboardSectionIcon:CreateInput("", {
+			Title = "Custom icon ID",
+			Description = "You need to input ONLY numbSers!",
+			Default = "",
+			Placeholder = "11971577760",
+			Numeric = true,
+			Finished = false,
+			Callback = function() end,
+		})
 
-	leaderboardSectionIcon:CreateButton({
-		Title = "Set leaderboard icon",
-		Description = "",
-		Callback = function()
-			--[[if leaderboardmethod.Value == "retarded" then
+		leaderboardSectionIcon:CreateButton({
+			Title = "Set leaderboard icon",
+			Description = "",
+			Callback = function()
+				--[[if leaderboardmethod.Value == "retarded" then
 				Library:Notify({ Title = "sorry", Content = "Retarded method is not avaliable.", Duration = 5 })
 				return
 			end]]
 
-			local iconPrompts = {
-				["Asiluga"] = "rbxassetid://9840325624",
-				["Babygoo25"] = "rbxassetid://2998647800",
-				["Realsayon1"] = "rbxassetid://9840323740",
-				["VIP"] = "rbxassetid://11919061440",
-			}
+				local iconPrompts = {
+					["Asiluga"] = "rbxassetid://9840325624",
+					["Babygoo25"] = "rbxassetid://2998647800",
+					["Realsayon1"] = "rbxassetid://9840323740",
+					["VIP"] = "rbxassetid://11919061440",
+				}
 
-			if boardiconinput.Value == "" then
-				selectedIcon = iconPrompts[leaderboardicon.Value] or ""
-			else
-				selectedIcon = "rbxassetid://" .. boardiconinput.Value
-			end
-
-			if leaderboardmethod.Value == "good" then
-				local success, response = pcall(function()
-					local targetfunc = getsenv(LPlayer.PlayerGui.board.Leaderboard).RegenPlayers :: () -> ();
-					(debug.getupvalue(targetfunc, 3) :: { [number]: string })[LPlayer.UserId] = selectedIcon
-					targetfunc()
-				end)
-
-				if not success then
-					Library:Notify({ Title = "Board icon: Error!", Content = response, Duration = 8 })
+				if boardiconinput.Value == "" then
+					selectedIcon = iconPrompts[leaderboardicon.Value] or ""
+				else
+					selectedIcon = "rbxassetid://" .. boardiconinput.Value
 				end
-			else
-				startConnectBoard()
-				updateImagelabelBoardIcon()
-			end
-		end,
-	})
+
+				if leaderboardmethod.Value == "good" then
+					local success, response = pcall(function()
+						local targetfunc = getsenv(LPlayer.PlayerGui.board.Leaderboard).RegenPlayers :: () -> ();
+						(debug.getupvalue(targetfunc, 3) :: { [number]: string })[LPlayer.UserId] = selectedIcon
+						targetfunc()
+					end)
+
+					if not success then
+						Library:Notify({ Title = "Board icon: Error!", Content = response, Duration = 8 })
+					end
+				else
+					startConnectBoard()
+					updateImagelabelBoardIcon()
+				end
+			end,
+		})
+
+		leaderboardSectionIcon:CreateToggle("", {
+			Title = "Hide from board",
+			Description = "Hides your userid and name from leaderboard header",
+			Callback = function(state)
+				if state then
+					(GUI.board.LeaderBoardFrame.Header.PlayerName :: TextLabel).TextTransparency = 1;
+					(GUI.board.LeaderBoardFrame.Header.User_ID :: TextLabel).TextTransparency = 1
+				else
+					(GUI.board.LeaderBoardFrame.Header.PlayerName :: TextLabel).TextTransparency = 0;
+					(GUI.board.LeaderBoardFrame.Header.User_ID :: TextLabel).TextTransparency = 0
+				end
+			end,
+		})
+	end
 
 	-- getting tags
 	local tagsTable = {} :: { [string]: WTDTagTableTag }
