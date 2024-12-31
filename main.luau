@@ -18,12 +18,14 @@ print("took " .. os.clock() - osclockBefore .. "s to load Fluent Renewed library
 
 osclockBefore = os.clock()
 
-local LPlayer = (game:GetService("Players") :: Players).LocalPlayer
-local GUI = LPlayer.PlayerGui :: PlayerGui
-local BoardSubFrame = GUI.board.LeaderBoardFrame.ListFrame.BottomFrame.SubFrame :: Frame
 local TeleportService = game:GetService("TeleportService") :: TeleportService
 local ReplicatedStorage = game:GetService("ReplicatedStorage") :: ReplicatedStorage
 local Lighting = game:GetService("Lighting") :: Lighting
+
+local GUI_Module = require(ReplicatedStorage:FindFirstChild("GUI_Module") :: ModuleScript)
+local LPlayer = (game:GetService("Players") :: Players).LocalPlayer
+local GUI = LPlayer.PlayerGui :: PlayerGui
+local BoardSubFrame = GUI.board.LeaderBoardFrame.ListFrame.BottomFrame.SubFrame :: Frame
 
 local FXEvent = ReplicatedStorage.Folder.FX :: RemoteEvent
 
@@ -305,6 +307,23 @@ do
 			end
 		end
 	end)
+
+	do
+		local section = Tabs.Local:AddSection("Trinkets")
+
+		section:CreateButton({
+			Title = "🔮 Get every single trinket",
+			Description = "You will not be able to equip it\nResets after switching tabs in menu",
+			Callback = newcclosure(function()
+				local trinkets = {} :: { string }
+				for i, _ in GUI_Module.Trinket do
+					table.insert(trinkets, i)
+				end
+
+				firesignal(FXEvent.OnClientEvent, "Trinket_Data", trinkets, #trinkets, {#trinkets})
+			end),
+		})
+	end
 
 	-- make tags last so no flood
 	local tagsSection = Tabs.Local:AddSection("Tags")
