@@ -22,12 +22,22 @@ local TeleportService = game:GetService("TeleportService") :: TeleportService
 local ReplicatedStorage = game:GetService("ReplicatedStorage") :: ReplicatedStorage
 local Lighting = game:GetService("Lighting") :: Lighting
 
-local GUI_Module = require(ReplicatedStorage:FindFirstChild("GUI_Module") :: ModuleScript)
+-- using pcall for no solara errors :money_mouth:
+local _, GUI_Module = pcall(function()
+	return require(ReplicatedStorage:FindFirstChild("GUI_Module") :: ModuleScript)
+end)
+local _, TimeModule = pcall(function()
+	return require(workspace:FindFirstChild("TimeModule") :: ModuleScript)
+end)
+local _, MapsModule = pcall(function()
+	return require(workspace:FindFirstChild("Module") :: ModuleScript)
+end)
 local LPlayer = (game:GetService("Players") :: Players).LocalPlayer
 local GUI = LPlayer.PlayerGui :: PlayerGui
 local BoardSubFrame = GUI.board.LeaderBoardFrame.ListFrame.BottomFrame.SubFrame :: Frame
 
-local FXEvent = ReplicatedStorage.Folder.FX :: RemoteEvent
+local FXRemote = ReplicatedStorage.Folder.FX :: RemoteEvent
+local TeleportRemote = ReplicatedStorage.TeleportRemote :: RemoteEvent
 
 local testerButtonPaths = {
 	GUI.AwesomeGUI.SettingsThing.Frame.testerButton,
@@ -37,6 +47,9 @@ local testerButtonPaths = {
 local placesIDs = { ["testerLobby"] = 756609063 } :: { [string]: number }
 
 local selectedIcon = ""
+
+local WTDVersion = workspace:GetAttribute("Update_Number") :: string
+local scriptVersion = "1.12.3"
 
 local function updateImagelabelBoardIcon()
 	for _, v in BoardSubFrame:GetChildren() do
@@ -90,6 +103,22 @@ local Tabs = {
 
 -- main tab
 do
+	local isUpdatedText = "❌ script is NOT updated for this version; requires v" .. scriptVersion
+	if WTDVersion == scriptVersion then
+		isUpdatedText = "✅ script is updated for this version!"
+	end
+	local seasonText = "🍂 current season: ???"
+	if TimeModule ~= nil then
+		seasonText = "🍂 current season: " .. TimeModule.GetSeason()
+	end
+	Tabs.Main:CreateParagraph(
+		"",
+		{
+			Title = "🏠 World Tower Defense",
+			Content = string.format("v%s\n\n%s\n\n%s", WTDVersion, seasonText, isUpdatedText),
+		}
+	)
+
 	Tabs.Main:CreateButton({
 		Title = "🌀 No blur",
 		Description = "Removes really bad blur at 8+ graphics",
@@ -104,6 +133,7 @@ do
 
 	Tabs.Main:CreateButton({
 		Title = "🌧️ No rain",
+		Description = "REMOVE RAIN FOR +999 FPS 🔥🔥🔥🗣️🗣️🗣️\nDoesn't increase performance by the way..",
 		Callback = function()
 			local pRain = workspace:FindFirstChild("pRain") :: Part
 			local Rains = workspace:FindFirstChild("rains") :: Folder
@@ -188,6 +218,20 @@ do
 			)
 		end,
 	})
+
+	do
+		local section = Tabs.Fun:AddSection("Teleporter")
+
+		section:CreateButton({
+			Title = "🌍 Select random map",
+			Callback = function()
+				if MapsModule ~= nil then
+					local randomMap = MapsModule.MapsEasyT[math.random(1, #MapsModule.MapsEasyT)]
+					TeleportRemote:FireServer("SetMap", { randomMap })
+				end
+			end,
+		})
+	end
 end
 
 -- local tab
@@ -285,7 +329,7 @@ do
 	-- getting tags
 	local tagsTable = {} :: { [string]: WTDTagTableTag }
 	local _, tagPCallResult = pcall(function()
-		for i, v in getconnections(FXEvent.OnClientEvent) do
+		for i, v in getconnections(FXRemote.OnClientEvent) do
 			local value
 			pcall(function()
 				value = debug.getupvalue(v.Function, 2) :: { [string]: { any } }
@@ -320,7 +364,7 @@ do
 					table.insert(trinkets, i)
 				end
 
-				firesignal(FXEvent.OnClientEvent, "Trinket_Data", trinkets, #trinkets, {#trinkets})
+				firesignal(FXRemote.OnClientEvent, "Trinket_Data", trinkets, #trinkets, { #trinkets })
 			end),
 		})
 	end
@@ -346,5 +390,7 @@ do
 		)
 	end
 end
+
+Window:SelectTab(1)
 
 print("took " .. os.clock() - osclockBefore .. "s to load main script!")
