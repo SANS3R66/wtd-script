@@ -89,7 +89,7 @@ local Tabs = {
 -- main tab
 do
 	Tabs.Main:CreateButton({
-		Title = "No blur",
+		Title = "🌀 No blur",
 		Description = "Removes really bad blur at 8+ graphics",
 		Callback = function()
 			for i, v in Lighting:GetChildren() do
@@ -101,7 +101,7 @@ do
 	})
 
 	Tabs.Main:CreateButton({
-		Title = "No rain",
+		Title = "🌧️ No rain",
 		Callback = function()
 			local pRain = workspace:FindFirstChild("pRain") :: Part
 			local Rains = workspace:FindFirstChild("rains") :: Folder
@@ -121,7 +121,7 @@ do
 
 	local testerButtonsToggle = testerSectionButtons:CreateToggle(
 		"",
-		{ Title = "Show tester buttons", Description = "They dont do anything anyways..", Default = false }
+		{ Title = "🧪 Show tester buttons", Description = "They dont do anything anyways..", Default = false }
 	)
 	testerButtonsToggle:OnChanged(function()
 		for i, v in testerButtonPaths do
@@ -130,7 +130,7 @@ do
 	end)
 
 	testerSectionButtons:CreateButton({
-		Title = "Teleport to the testing lobby",
+		Title = "🌀 Teleport to the testing lobby",
 		Description = "haha get scammed!!",
 		Callback = function()
 			TeleportService:Teleport(placesIDs.testerLobby)
@@ -139,7 +139,7 @@ do
 
 	local miscSection = Tabs.Fun:AddSection("Misc")
 	miscSection:CreateButton({
-		Title = "Show hidden menus in 'menu'",
+		Title = "🕵️ Show hidden menus in 'menu'",
 		Description = "",
 		Callback = function()
 			for i, v in LPlayer.PlayerGui.AwesomeGUI.Shop.ImageLabel.ScrollingFrame:GetChildren() do
@@ -151,7 +151,7 @@ do
 	})
 
 	miscSection:CreateButton({
-		Title = "Show every campaign",
+		Title = "🏢 Show every campaign",
 		Description = "",
 		Callback = function()
 			for i, v in LPlayer.PlayerGui.AwesomeGUI.Shop.ChallengeArray.Array2:GetChildren() do
@@ -163,7 +163,7 @@ do
 	})
 
 	local campaignidInput = miscSection:CreateInput("", {
-		Title = "Campaign",
+		Title = "📝 Campaign",
 		Description = "",
 		Default = "",
 		Placeholder = "201",
@@ -172,7 +172,7 @@ do
 		Callback = function() end,
 	})
 	miscSection:CreateButton({
-		Title = "Play",
+		Title = "🎮 Play this campaign ID",
 		Description = "",
 		Callback = function()
 			if campaignidInput.Value == "" then
@@ -201,7 +201,7 @@ do
 		local leaderboardSectionIcon = Tabs.Local:AddSection("Leaderboard")
 
 		local leaderboardmethod = leaderboardSectionIcon:CreateDropdown("boardmethod", {
-			Title = "Leaderboard icon replacement method",
+			Title = "🔍 Leaderboard icon replacement method",
 			Description = "Select leaderboard icon replacement method",
 			Values = { "good", "retarded" },
 		})
@@ -209,21 +209,21 @@ do
 
 		leaderboardSectionIcon:CreateParagraph("", {
 			Title = "Methods",
-			Content = "good - Use this method because its not retarded. Only if this executor supports getsenv and debug.getupvalue \n\nretarded - Using shitty ass method via replacing icon in ImageLabel. Use this if you use something like solara. \n\nRetarded method will overwrite good method",
+			Content = "👍 good - Use this method because its not retarded. Only if this executor supports getsenv and debug.getupvalue \n\n🤪 retarded - Using shitty ass method via replacing icon in ImageLabel. Use this if you use something like solara. \n\nRetarded method will overwrite good method",
 			TitleAlignment = "Middle",
 			ContentAlignment = Enum.TextXAlignment.Center,
 		})
 
 		local leaderboardicon = leaderboardSectionIcon:CreateDropdown("boardicon", {
-			Title = "Leaderboard icon replacement method",
+			Title = "🖼️ Leaderboard icon",
 			Description = "Select leaderboard icon replacement method",
 			Values = { "Asiluga", "Babygoo25", "Realsayon1", "VIP", "No icon" },
 		})
 		leaderboardicon:SetValue("No icon")
 
 		local boardiconinput = leaderboardSectionIcon:CreateInput("", {
-			Title = "Custom icon ID",
-			Description = "You need to input ONLY numbSers!",
+			Title = "🆔 Custom icon ID",
+			Description = "You need to input ONLY numbers!",
 			Default = "",
 			Placeholder = "11971577760",
 			Numeric = true,
@@ -232,14 +232,9 @@ do
 		})
 
 		leaderboardSectionIcon:CreateButton({
-			Title = "Set leaderboard icon",
+			Title = "🏆 Set leaderboard icon",
 			Description = "",
 			Callback = function()
-				--[[if leaderboardmethod.Value == "retarded" then
-				Library:Notify({ Title = "sorry", Content = "Retarded method is not avaliable.", Duration = 5 })
-				return
-			end]]
-
 				local iconPrompts = {
 					["Asiluga"] = "rbxassetid://9840325624",
 					["Babygoo25"] = "rbxassetid://2998647800",
@@ -271,7 +266,7 @@ do
 		})
 
 		leaderboardSectionIcon:CreateToggle("", {
-			Title = "Hide from board",
+			Title = "🎭 Hide from board",
 			Description = "Hides your userid and name from leaderboard header",
 			Callback = function(state)
 				if state then
@@ -289,7 +284,13 @@ do
 	local tagsTable = {} :: { [string]: WTDTagTableTag }
 	local _, tagPCallResult = pcall(function()
 		for i, v in getconnections(FXEvent.OnClientEvent) do
-			local value = debug.getupvalue(v.Function, 2) :: { [string]: { any } }
+			local value
+			pcall(function()
+				value = debug.getupvalue(v.Function, 2) :: { [string]: { any } }
+			end)
+			if value == nil then
+				continue
+			end
 			if type(value) == "table" then
 				if value["none"] ~= nil then
 					-- fucking types
@@ -307,7 +308,7 @@ do
 
 	-- make tags last so no flood
 	local tagsSection = Tabs.Local:AddSection("Tags")
-	local formatString = "[TAG %s] %s [%d]"
+	local formatString = "🏷️ [TAG %s] %s [%d]"
 	if tagsTable["none"] ~= nil then
 		for i, v in tagsTable do
 			tagsSection:CreateButton({
