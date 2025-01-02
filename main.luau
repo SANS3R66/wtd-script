@@ -39,17 +39,12 @@ local BoardSubFrame = GUI.board.LeaderBoardFrame.ListFrame.BottomFrame.SubFrame 
 local FXRemote = ReplicatedStorage.Folder.FX :: RemoteEvent
 local TeleportRemote = ReplicatedStorage.TeleportRemote :: RemoteEvent
 
-local testerButtonPaths = {
-	GUI.AwesomeGUI.SettingsThing.Frame.testerButton,
-	GUI.AwesomeGUI.SettingsThing.Frame.theButton,
-	GUI.AwesomeGUI.SettingsThing.Frame.theButton2,
-} :: { TextButton }
 local placesIDs = { ["testerLobby"] = 756609063 } :: { [string]: number }
 
 local selectedIcon = ""
 
 local WTDVersion = workspace:GetAttribute("Update_Number") :: string
-local scriptVersion = "1.12.3"
+local scriptVersion = "1.13"
 
 local function updateImagelabelBoardIcon()
 	for _, v in BoardSubFrame:GetChildren() do
@@ -132,9 +127,10 @@ do
 	})
 
 	Tabs.Main:CreateButton({
-		Title = "🌧️ No rain",
-		Description = "REMOVE RAIN FOR +999 FPS 🔥🔥🔥🗣️🗣️🗣️\nDoesn't increase performance by the way..",
+		Title = "❄️ No snow",
+		Description = "REMOVE SNOW FOR +999 FPS 🔥🔥🔥🗣️🗣️🗣️\nDoesn't increase performance by the way..",
 		Callback = function()
+			-- still (water) rain for some reason; babygoo is lazy :sob:
 			local pRain = workspace:FindFirstChild("pRain") :: Part
 			local Rains = workspace:FindFirstChild("rains") :: Folder
 			if pRain then
@@ -156,9 +152,7 @@ do
 		{ Title = "🧪 Show tester buttons", Description = "They dont do anything anyways..", Default = false }
 	)
 	testerButtonsToggle:OnChanged(function()
-		for i, v in testerButtonPaths do
-			v.Visible = testerButtonsToggle.Value
-		end
+		GUI.AwesomeGUI.SettingsThing.Frame.Tester_Menu.Visible = not GUI.AwesomeGUI.SettingsThing.Frame.Tester_Menu.Visible
 	end)
 
 	testerSectionButtons:CreateButton({
