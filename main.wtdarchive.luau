@@ -10,12 +10,19 @@ osclockBefore = os.clock()
 local ReplicatedStorage = game:GetService("ReplicatedStorage") :: ReplicatedStorage
 local Lighting = game:GetService("Lighting") :: Lighting
 local Debris = game:GetService("Debris") :: Debris
+local TweenService = game:GetService("TweenService") :: TweenService
 
 local LPlayer = (game:GetService("Players") :: Players).LocalPlayer
 local Character = LPlayer.Character :: Model
 local HRoot = Character:FindFirstChild("HumanoidRootPart") :: Part
 local _GUI = LPlayer.PlayerGui :: PlayerGui
 local FX = ReplicatedStorage.Folder.FX :: RemoteEvent
+local triggerBasement = workspace:FindFirstChild("TriggerBasement") :: Part
+
+local cache = {
+	bruhdoor = workspace:FindFirstChild("BruhDoor") :: Model,
+	triggerBasementTouch = triggerBasement:FindFirstChild("TouchInterest") :: TouchTransmitter
+}
 
 local selectedIcon
 
@@ -97,6 +104,41 @@ do
 				Debris:AddItem(v4, 1)
 			end,
 		})
+
+		section:CreateButton({
+			Title = "Open ruined facility door",
+			Description = "Re-implemented from decompilation\nIf you dont have atleast 10 trophies, you will get teleported to the old lobby.\nKill ruined facility trigger to work then.",
+			Callback = function()
+				if not cache.bruhdoor:GetAttribute("Moving") then
+					cache.bruhdoor:SetAttribute("Moving", true)
+					cache.bruhdoor.hitbox.open:Play()
+					for i, v in cache.bruhdoor.Door:GetChildren() do
+						TweenService:Create(
+							v,
+							TweenInfo.new(1, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out, 0, false, 0),
+							{ Position = v.Position + Vector3.new(0, 6, 0) }
+						):Play()
+					end
+					task.wait(3)
+					cache.bruhdoor.hitbox.close:Play()
+					for i, v in cache.bruhdoor.Door:GetChildren() do
+						TweenService:Create(
+							v,
+							TweenInfo.new(1, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out, 0, false, 0),
+							{ Position = v.Position - Vector3.new(0, 6, 0) }
+						):Play()
+					end
+					task.wait(1)
+					cache.bruhdoor:SetAttribute("Moving", nil)
+				end
+			end,
+		})
+
+		section:CreateButton({Title = "Kill ruined facility trigger", Callback = function()
+			if cache.triggerBasementTouch ~= nil then
+				cache.triggerBasementTouch:Destroy()
+			end
+		end})
 	end
 end
 
@@ -148,7 +190,7 @@ do
 
 				local success, response = pcall(function()
 					local targetfunc = getsenv(LPlayer.PlayerGui.board.Leaderboard).RegenPlayers :: () -> ();
-					(debug.getupvalue(targetfunc, 1) :: { [string]: string })[LPlayer.Name] = selectedIcon
+					(debug.getupvalue(targetfunc, 1) :: { [string]: string })[string.lower(LPlayer.Name)] = selectedIcon
 					targetfunc()
 				end)
 

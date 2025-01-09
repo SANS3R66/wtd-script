@@ -12779,6 +12779,9 @@ declare function newcclosure(func: (...any) -> (...any)): (...any) -> (...any)
 declare function firesignal(signal: RBXScriptSignal, ...: any)
 declare function gethui(): ScreenGui
 declare function cloneref(instance: any): any
+declare function fireclickdetector(object: ClickDetector, distance: number?, event: string?): ()
+declare function fireproximityprompt(object: ProximityPrompt): ()
+declare function firetouchinterest(touchingpart: BasePart, parttotouch: BasePart, mode: number)
 
 type FluentUIConstructor = {
     ["Title"]: string, ["SubTitle"]: string, ["TabWidth"]: number,
