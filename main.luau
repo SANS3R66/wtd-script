@@ -256,7 +256,7 @@ do
 
 		local leaderboardicon = leaderboardSectionIcon:CreateDropdown("boardicon", {
 			Title = "🖼️ Leaderboard icon",
-			Description = "Select leaderboard icon replacement method",
+			Description = "Select leaderboard icon for replace",
 			Values = { "Asiluga", "Babygoo25", "Realsayon1", "VIP", "No icon" },
 		})
 		leaderboardicon:SetValue("No icon")
@@ -296,7 +296,7 @@ do
 					end)
 
 					if not success then
-						Library:Notify({ Title = "Board icon: Error!", Content = response, Duration = 8 })
+						Library:Notify({ Title = "Board icon: Error", Content = response, Duration = 8 })
 					end
 				else
 					startConnectBoard()
@@ -352,14 +352,14 @@ do
 		section:CreateButton({
 			Title = "🔮 Get every single trinket",
 			Description = "You will not be able to equip it\nResets after switching tabs in menu",
-			Callback = newcclosure(function()
+			Callback = function()
 				local trinkets = {} :: { string }
 				for i, _ in GUI_Module.Trinket do
 					table.insert(trinkets, i)
 				end
 
 				firesignal(FXRemote.OnClientEvent, "Trinket_Data", trinkets, #trinkets, { #trinkets })
-			end),
+			end,
 		})
 	end
 
