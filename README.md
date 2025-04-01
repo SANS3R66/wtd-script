@@ -1,11 +1,11 @@
 # About macroses
 Macros are 100% accurate; wherever you place a unit, that's where it will be placed.
 
-However! When recording macros that rely on money timing (for example, placing a unit at the exact moment you have enough money) - the macro might not work, because the great WTD randomness didn't want to give you the required amount of money. (This will be fixed in the next update)
+However! When recording macros that rely on money timing (for example, placing a unit at the exact moment you have enough money) - the macro might not work, because the great WTD randomness didn't want to give you the required amount of money. (actually fixed rn but dont abuse and ur macros will be good)
 
 Macros are intended ONLY for single-player games. (Or, if you want to play with other players - they also need to do everything according to the script as it was when the macro was recorded).
 
-Targeting/removing units is NOT implemented. Planned for the next update.
+Removing units is NOT implemented. Planned for the next update.
 
 
 # The World: Tower Defenders Roblox game script... first ever public WTD script! Very pro.
