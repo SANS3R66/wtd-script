@@ -75,12 +75,15 @@ if LibrarySrc ~= nil then
 	Library = LibrarySrc()
 end
 
-local LPlayer = (game:GetService("Players") :: Players).LocalPlayer
-local GUI = LPlayer.PlayerGui :: PlayerGui
-local Towers = GUI.AwesomeGUI.Towers :: Frame
 local ReplicatedStorage = game:GetService("ReplicatedStorage") :: ReplicatedStorage
 local Lighting = game:GetService("Lighting") :: Lighting
 local RunService = game:GetService("RunService") :: RunService
+local TeleportService = game:GetService("TeleportService") :: TeleportService
+local GuiService = game:GetService("GuiService") :: GuiService
+
+local LPlayer = (game:GetService("Players") :: Players).LocalPlayer
+local GUI = LPlayer.PlayerGui :: PlayerGui
+local Towers = GUI.AwesomeGUI.Towers :: Frame
 local SpawnUnit = ReplicatedStorage:FindFirstChild("SpawnUnit") :: RemoteEvent
 local UpgradeTower = ReplicatedStorage:FindFirstChild("UpgradeTower") :: RemoteEvent
 local ChangeUnitTargetting = ReplicatedStorage.ChangeUnitTargetting :: RemoteEvent
@@ -92,6 +95,11 @@ local VirtualUser = cloneref(game:GetService("VirtualUser"))
 LPlayer.Idled:Connect(function()
 	VirtualUser:CaptureController()
 	VirtualUser:ClickButton2(Vector2.new())
+end)
+
+-- autorejoin (if internet disconnection for example)
+GuiService.ErrorMessageChanged:Connect(function()
+    TeleportService:Teleport(game.PlaceId, LPlayer)
 end)
 
 if _G.autorestart then
