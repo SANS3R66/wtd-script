@@ -89,7 +89,7 @@ local CASH = LPlayer:WaitForChild("CASH", 20) :: NumberValue
 
 -- antiafk
 local VirtualUser = cloneref(game:GetService("VirtualUser"))
-LPlayer.LocalPlayer.Idled:Connect(function()
+LPlayer.Idled:Connect(function()
 	VirtualUser:CaptureController()
 	VirtualUser:ClickButton2(Vector2.new())
 end)
