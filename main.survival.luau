@@ -291,7 +291,7 @@ do
                                         Duration = 3,
                                     })
 
-                                    repeat RunService.HeartBeat:Wait() until CASH.Value >= realCost.Value
+                                    repeat RunService.Heartbeat:Wait() until CASH.Value >= realCost.Value
                                 end
                                 SpawnUnit:FireServer("lol", UITower, macrosData.spawnlocation, macrosData.position)
                                 Library:Notify({
@@ -309,7 +309,7 @@ do
                                         Duration = 3,
                                     })
 
-                                    repeat RunService.HeartBeat:Wait() until CASH.Value >= upCost.Value
+                                    repeat RunService.Heartbeat:Wait() until CASH.Value >= upCost.Value
                                 end
 
                                 UpgradeTower:FireServer("lol", UITower)
