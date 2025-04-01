@@ -1,4 +1,14 @@
-The World: Tower Defenders Roblox game script... first ever public WTD script! Very pro.
+# About macroses
+Macros are 100% accurate; wherever you place a unit, that's where it will be placed.
+
+However! When recording macros that rely on money timing (for example, placing a unit at the exact moment you have enough money) - the macro might not work, because the great WTD randomness didn't want to give you the required amount of money. (This will be fixed in the next update)
+
+Macros are intended ONLY for single-player games. (Or, if you want to play with other players - they also need to do everything according to the script as it was when the macro was recorded).
+
+Targeting/removing units is NOT implemented. Planned for the next update.
+
+
+# The World: Tower Defenders Roblox game script... first ever public WTD script! Very pro.
 
 synapse.d.luau is types made by me that includes some of Synapse env that i use and some of FluentUI methods. Not finished. (use [vscode extension](https://marketplace.visualstudio.com/items?itemName=JohnnyMorganz.luau-lsp))
 
