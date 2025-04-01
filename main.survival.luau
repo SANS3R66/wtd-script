@@ -358,13 +358,13 @@ do
                         macroIndex += 1
                     end
                 else
-                    connection:Disconnect()
                     isMacrosPlaying = false
                     Library:Notify({
                         Title = string.format("[%s] Macros: Success", fileMacros.Value),
                         Content = "Done! Macros file has no more instructions!!",
                         Duration = 8,
                     })
+                    connection:Disconnect()
                 end
             end)
 		end,
