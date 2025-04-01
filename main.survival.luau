@@ -7,6 +7,7 @@
         _G.autorestart = nil/true -- will macros restart on win or lose or sandbox
         _G.autoload = "macros.lua" -- macros to play on script load
         _G.autovote = nil | "painless" | "casual" | "burdensome" -- vote mode and start now on script load
+        _G.afk = nil/true -- sets fps cap to 30 and disables 3D rendering
 
         example [
             _G.autorestart = true
@@ -15,10 +16,6 @@
         ]
     ]
 ]]
-
-_G.autorestart = true
-_G.autoload = "macros_casual.lua"
-_G.autovote = "casual"
 
 makefolder("wtdhook")
 makefolder("wtdhook/macroses")
@@ -102,9 +99,16 @@ GuiService.ErrorMessageChanged:Connect(function()
     TeleportService:Teleport(game.PlaceId, LPlayer)
 end)
 
+if _G.afk then
+    setfpscap(30)
+    RunService:Set3dRenderingEnabled(false)
+end
+
 if _G.autorestart then
 	local function restart()
 		ReplicatedStorage:FindFirstChild("Died"):FindFirstChild("RestartGame"):FireServer()
+        task.wait(5) -- something is broken so we just manually teleport
+        TeleportService:Teleport(game.PlaceId, LPlayer)
 	end
 
 	ReplicatedStorage.END_LOSE.OnClientEvent:Connect(restart)
