@@ -77,6 +77,8 @@ local Lighting = game:GetService("Lighting") :: Lighting
 local RunService = game:GetService("RunService") :: RunService
 local TeleportService = game:GetService("TeleportService") :: TeleportService
 local GuiService = game:GetService("GuiService") :: GuiService
+local UserInputService = game:GetService("UserInputService") :: UserInputService
+local PathfindingService = game:GetService("PathfindingService") :: PathfindingService
 
 local LPlayer = (game:GetService("Players") :: Players).LocalPlayer
 local GUI = LPlayer.PlayerGui :: PlayerGui
@@ -88,27 +90,27 @@ local BluTeamUnits = workspace:FindFirstChild("BluTeamUnits") :: Folder
 local CASH = LPlayer:WaitForChild("CASH", 20) :: NumberValue
 
 -- antiafk
-local VirtualUser = cloneref(game:GetService("VirtualUser"))
+local VirtualUser = game:GetService("VirtualUser")
 LPlayer.Idled:Connect(function()
 	VirtualUser:CaptureController()
 	VirtualUser:ClickButton2(Vector2.new())
 end)
 
--- autorejoin (if internet disconnection for example)
+-- autorejoin
 GuiService.ErrorMessageChanged:Connect(function()
-    TeleportService:Teleport(game.PlaceId, LPlayer)
+	TeleportService:Teleport(game.PlaceId, LPlayer)
 end)
 
 if _G.afk then
-    setfpscap(30)
-    RunService:Set3dRenderingEnabled(false)
+	setfpscap(30)
+	RunService:Set3dRenderingEnabled(false)
 end
 
 if _G.autorestart then
 	local function restart()
 		ReplicatedStorage:FindFirstChild("Died"):FindFirstChild("RestartGame"):FireServer()
-        task.wait(5) -- something is broken so we just manually teleport
-        TeleportService:Teleport(game.PlaceId, LPlayer)
+		task.wait(8) -- those who know
+		TeleportService:Teleport(game.PlaceId, LPlayer)
 	end
 
 	ReplicatedStorage.END_LOSE.OnClientEvent:Connect(restart)
@@ -139,8 +141,6 @@ local Tabs = {
 
 -- main tab
 do
-	-- TODO: make macros more stable
-	-- TODO: make macros record and play restart game
 	-- TODO: make macros record and play unit targetting
 	--[[
             halfy done. current method using position to compare, so it wont work for moving units
@@ -163,77 +163,106 @@ do
 		local mt = getrawmetatable(game)
 		setreadonly(mt, false)
 		local old
-		old = hookmetamethod(game, "__namecall", function(Self, ...)
-			--local oldidentity = getthreadidentity()
-			local args = { ... }
-			local method = getnamecallmethod()
-			local timestamp = secondsMacros
-
-			if method == "FireServer" and isMacrosRecording then
-				if args[1] == "lol" then
-					task.spawn(function()
-						macrosResult[timestamp] = {}
-						local UITower = Towers:FindFirstChild(args[2].Name) :: TextButton
-						local spawnlocation = args[3]
-
-						if type(spawnlocation) == "number" then -- placing unit
-							macrosResult[timestamp].type = "spawn"
-							macrosResult[timestamp].tower = args[2].Name
-							macrosResult[timestamp].spawnlocation = spawnlocation
-							macrosResult[timestamp].position = args[4]
-
-							task.defer(function() -- creates thread
-								setthreadidentity(8)
-								Library:Notify({
-									Title = string.format("[%.1fs: %s] Macros", secondsMacros, fileMacros.Value),
-									Content = string.format(
-										"RECORDED: Spawning unit '%s'",
-										findUnitNameUsingUI(cloneref(UITower) :: TextButton)
-									),
-									Duration = 3,
-								})
-
-								-- we chaning identity in our thread (not in __namecall thread), so changing identity back is useless
-							end)
-						elseif spawnlocation == nil then -- upgrading unit
-							macrosResult[timestamp].type = "upgrade"
-							macrosResult[timestamp].tower = args[2].Name
-
-							task.defer(function()
-								setthreadidentity(8)
-								Library:Notify({
-									Title = string.format("[%.1fs: %s] Macros", secondsMacros, fileMacros.Value),
-									Content = string.format(
-										"RECORDED: Upgrading unit '%s'",
-										findUnitNameUsingUI(UITower)
-									),
-									Duration = 3,
-								})
-							end)
-						end
-					end)
-				elseif Self.Name == "ChangeUnitTargetting" then -- retargetting unit
-					local retargetUnitPosition = args[1]:FindFirstChild("HumanoidRootPart").Position
-					local target = args[3][1]
-
-					macrosResult[timestamp] = {}
-					macrosResult[timestamp].type = "target"
-					macrosResult[timestamp].position = retargetUnitPosition
-					macrosResult[timestamp].target = target
-
-					task.defer(function()
-						setthreadidentity(8)
-						Library:Notify({
-							Title = string.format("[%.1fs: %s] Macros", secondsMacros, fileMacros.Value),
-							Content = string.format("RECORDED: Retargetting unit '%s' to '%s'", args[1].Name, target),
-							Duration = 3,
-						})
-					end)
+		old = hookmetamethod(
+			game,
+			"__namecall",
+			newcclosure(function(self, ...)
+				if not isMacrosRecording then
+					return old(self, ...)
 				end
-			end
+				local method = getnamecallmethod()
+				local args = { ... }
 
-			return old(Self, ...)
-		end)
+				if method == "FireServer" then
+					local timestamp = secondsMacros
+					if args[1] == "lol" then
+						task.spawn(function()
+							macrosResult[timestamp] = {}
+							local UITower = Towers:FindFirstChild(args[2].Name) :: TextButton
+							local spawnlocation = args[3]
+
+							if type(spawnlocation) == "number" then -- placing unit
+								macrosResult[timestamp].type = "spawn"
+								macrosResult[timestamp].tower = args[2].Name
+								macrosResult[timestamp].spawnlocation = spawnlocation
+								macrosResult[timestamp].position = args[4]
+
+								task.defer(function() -- creates thread
+									setthreadidentity(8)
+									Library:Notify({
+										Title = string.format("[%.1fs: %s] Macros", secondsMacros, fileMacros.Value),
+										Content = string.format(
+											"RECORDED: Spawning unit '%s'",
+											findUnitNameUsingUI(cloneref(UITower) :: TextButton)
+										),
+										Duration = 3,
+									})
+
+									-- we chaning identity in our thread (not in __namecall thread), so changing identity back is useless
+								end)
+							elseif spawnlocation == nil then -- upgrading unit
+								macrosResult[timestamp].type = "upgrade"
+								macrosResult[timestamp].tower = args[2].Name
+
+								task.defer(function()
+									setthreadidentity(8)
+									Library:Notify({
+										Title = string.format("[%.1fs: %s] Macros", secondsMacros, fileMacros.Value),
+										Content = string.format(
+											"RECORDED: Upgrading unit '%s'",
+											findUnitNameUsingUI(UITower)
+										),
+										Duration = 3,
+									})
+								end)
+							end
+						end)
+					end
+					if self.Name == "ChangeUnitTargetting" then
+						task.spawn(function()
+							local unitPosition = args[1]:FindFirstChild("HumanoidRootPart").Position
+
+							if args[2] == "SetTarget" then -- retargetting unit
+								local target = args[3][1]
+
+								macrosResult[timestamp] = {}
+								macrosResult[timestamp].type = "target"
+								macrosResult[timestamp].position = unitPosition
+								macrosResult[timestamp].target = target
+
+								task.defer(function()
+									setthreadidentity(8)
+									Library:Notify({
+										Title = string.format("[%.1fs: %s] Macros", secondsMacros, fileMacros.Value),
+										Content = string.format(
+											"RECORDED: Retargetting unit '%s' to '%s'",
+											args[1].Name,
+											target
+										),
+										Duration = 3,
+									})
+								end)
+							else -- destroying unit
+								macrosResult[timestamp] = {}
+								macrosResult[timestamp].type = "destroy"
+								macrosResult[timestamp].position = unitPosition
+
+								task.defer(function()
+									setthreadidentity(8)
+									Library:Notify({
+										Title = string.format("[%.1fs: %s] Macros", secondsMacros, fileMacros.Value),
+										Content = string.format("RECORDED: Destroying unit '%s'", args[1].Name),
+										Duration = 3,
+									})
+								end)
+							end
+						end)
+					end
+				end
+
+				return old(self, ...)
+			end)
+		)
 	end
 
 	macrosSection:CreateButton({
@@ -282,10 +311,12 @@ do
 			})
 			--getrawmetatable(game)["__namecall"] = old
 
-			writefile(
-				string.format("wtdhook/macroses/%s", fileMacros.Value),
-				string.format("return {%s}", table_to_string(macrosResult, ""))
-			)
+			local path = string.format("wtdhook/macroses/%s", fileMacros.Value)
+
+			if isfile(path) then
+				delfile(path)
+			end
+			writefile(path, string.format("return {%s}", table_to_string(macrosResult, "")))
 		end,
 	})
 
@@ -311,7 +342,7 @@ do
 		local macrosStr = loadfile(string.format("wtdhook/macroses/%s", fileMacros.Value), "WTDMacros")
 		local macroTable = macrosStr() :: {
 			[number]: {
-				type: "spawn" | "upgrade" | "target",
+				type: "spawn" | "upgrade" | "target" | "destroy",
 				position: Vector3,
 				spawnlocation: number,
 				tower: "Tower1" | "Tower2" | "Tower3" | "Tower4" | "Tower5",
@@ -417,6 +448,35 @@ do
 								Duration = 5,
 							})
 						end
+					elseif macrosData.type == "destroy" then -- same as target
+						local foundUnit = nil
+						local foundUnitName: string
+
+						for i, v in BluTeamUnits:GetChildren() do
+							local distance = vector.magnitude(v.HumanoidRootPart.Position - macrosData.position)
+
+							if distance <= MAX_TARGETTING_DISTANCE then
+								foundUnit = v
+								foundUnitName = v.Name
+								break
+							end
+						end
+
+						if foundUnit == nil then
+							Library:Notify({
+								Title = string.format("WARN [%s] Macros", fileMacros.Value),
+								Content = "Couldnt find unit to destroy, ignoring",
+								Duration = 5,
+							})
+						else
+							ChangeUnitTargetting:FireServer(foundUnit, true)
+
+							Library:Notify({
+								Title = string.format("[%s] Macros", fileMacros.Value),
+								Content = string.format("Destroyed unit '%s'", foundUnitName),
+								Duration = 5,
+							})
+						end
 					else
 						Library:Notify({
 							Title = string.format("WARN [%s] Macros", fileMacros.Value),
@@ -473,14 +533,103 @@ do
 			local GameState = Lighting:FindFirstChild("GameStuff"):FindFirstChild("GameState") :: NumberValue
 			--local SecondsLeft = Lighting:FindFirstChild("GameStuff"):FindFirstChild("SecondsLeft") :: NumberValue
 			GameState.Changed:Wait() -- starting up
-			print("a")
 			GameState.Changed:Wait() -- mode selected
 			Library:Notify({
 				Title = "Macros helper",
-				Content = string.format("Playing macros '%s'!!", _G.autoload),
+				Content = string.format("Auto playing macros '%s'!!", _G.autoload),
 				Duration = 8,
 			})
 			internal_playMacros()
 		end
 	end)
+
+	--
+	local miscSection = Tabs.Main:AddSection("Misc")
+	miscSection:CreateParagraph("", { Title = "Misc section", Content = "Some misc stuff" })
+
+	local upgkeybindsActivated = false
+	local UPG_KEY_CODES = {
+		[Enum.KeyCode.Z] = "Tower1",
+		[Enum.KeyCode.X] = "Tower2",
+		[Enum.KeyCode.C] = "Tower3",
+		[Enum.KeyCode.V] = "Tower4",
+		[Enum.KeyCode.B] = "Tower5",
+	}
+
+	local altHold = false
+
+	UserInputService.InputBegan:Connect(function(input, gamepre)
+		if not gamepre then
+			if upgkeybindsActivated then
+				local tower = UPG_KEY_CODES[input.KeyCode]
+				if tower then
+					UpgradeTower:FireServer("lol", Towers:FindFirstChild(tower))
+				end
+			end
+
+			if input.KeyCode == Enum.KeyCode.LeftAlt then
+				altHold = true
+			end
+		end
+	end)
+	UserInputService.InputEnded:Connect(function(input, gamepre)
+		if not gamepre then
+			if input.KeyCode == Enum.KeyCode.LeftAlt then
+				altHold = false
+			end
+		end
+	end)
+
+	for i = 1, 5 do
+		local tower = "Tower" .. tostring(i)
+		local towerpath = GUI.AwesomeGUI.Towers:FindFirstChild(tower) :: TextButton
+		local spawns = getsenv(towerpath.ReallyImportantScript).spawns
+		print(tower, towerpath, spawns)
+
+		local oldS
+		oldS = hookfunction(spawns, function(pos)
+			-- too many upvalues so i cant use those locals
+			if altHold then
+				repeat
+					game:GetService("RunService").Heartbeat:Wait()
+				until game.Players.LocalPlayer.CASH.Value >= getcallingscript().Parent.RealCost.Value and getcallingscript().Parent.Cooldown.Value <= 0
+			end
+
+			return oldS(pos)
+		end)
+	end
+
+	miscSection:CreateButton({
+		Title = "Toggle upgrade keybinds",
+		Description = "Allows you to upgrade units with keybinds:\nZ, X, C, V, B.\n(click again to this button to deactivate/activate)",
+		Callback = function()
+			upgkeybindsActivated = not upgkeybindsActivated
+		end,
+	})
+
+	miscSection:CreateButton({
+		Title = "Show rusher path",
+		Description = "Shows, how rushers gonna rush\n(may be not accurate)",
+		Callback = function()
+			for i, zspawn in workspace.BluTeamZombieSpawns:GetChildren() do
+				task.defer(function()
+					local Path = PathfindingService:CreatePath({ AgentRadius = 3 })
+					Path:ComputeAsync(zspawn.Position, workspace.BluTeamUnits.BLUend.HumanoidRootPart.Position)
+					local fold = Instance.new("Folder", workspace)
+					fold.Name = "wtd_rush_path"
+					local desiredColor = Color3.fromRGB(math.random(1, 255), math.random(1, 255), math.random(1, 255))
+
+					for i, v in Path:GetWaypoints() do
+						local part = Instance.new("Part", fold)
+						part.Anchored = true
+						part.CanCollide = false
+						part.Position = v.Position
+						part.Transparency = 0.5
+						part.Size = vector.create(0.6, 0.6, 0.6)
+						part.Color = desiredColor
+					end
+				end)
+			end
+		end,
+	})
 end
