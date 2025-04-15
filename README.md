@@ -5,8 +5,6 @@ However! When recording macros that rely on money timing (for example, placing a
 
 Macros are intended ONLY for single-player games. (Or, if you want to play with other players - they also need to do everything according to the script as it was when the macro was recorded).
 
-Removing units is NOT implemented. Planned for the next update.
-
 
 # The World: Tower Defenders Roblox game script... first ever public WTD script! Very pro.
 
