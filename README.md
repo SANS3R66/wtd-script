@@ -8,7 +8,7 @@ Macros are intended ONLY for single-player games. (Or, if you want to play with 
 
 # The World: Tower Defenders Roblox game script... first ever public WTD script! Very pro.
 
-~synapse.d.luau is types made by me that includes some of Synapse env that i use and some of FluentUI methods. Not finished. (use [vscode extension](https://marketplace.visualstudio.com/items?itemName=JohnnyMorganz.luau-lsp))~ (not supported anymore)
+~synapse.d.luau is types made by me that includes some of Synapse env that i use and some of FluentUI methods. Not finished. (use [vscode extension](https://marketplace.visualstudio.com/items?itemName=JohnnyMorganz.luau-lsp))~ (not supported anymore, use [this updated version](https://github.com/SANS3R66/synapse.d.luau/blob/main/synapse.d.luau))
 
 The main script in **main.luau** file. You can edit it whatever you want, but give me credit atleast :(
 
